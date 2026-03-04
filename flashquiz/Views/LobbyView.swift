@@ -46,6 +46,9 @@ struct LobbyView: View {
                 }
             }
             .listStyle(.plain)
+            .frame(height: 220)
+
+            ChatPanelView(session: session, title: "Sohbet", height: 160)
 
             Button(viewModel.isCurrentPlayerReady ? "Hazır Değilim" : "Hazırım") {
                 viewModel.toggleReady()

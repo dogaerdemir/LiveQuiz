@@ -15,84 +15,92 @@ struct QuestionView: View {
     }
 
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 10) {
             if let room = session.room, let question = room.currentQuestion {
-                Text("Süre: \(viewModel.remainingSeconds)")
-                    .font(.title.bold())
-                    .foregroundStyle(viewModel.remainingSeconds <= 5 ? .red : .primary)
+                ScrollView {
+                    VStack(spacing: 14) {
+                        Text("Süre: \(viewModel.remainingSeconds)")
+                            .font(.title.bold())
+                            .foregroundStyle(viewModel.remainingSeconds <= 5 ? .red : .primary)
 
-                Text("Soru \(room.currentQuestionIndex + 1) / \(room.questions.count)")
-                    .font(.headline)
-                    .foregroundStyle(.secondary)
+                        Text("Soru \(room.currentQuestionIndex + 1) / \(room.questions.count)")
+                            .font(.headline)
+                            .foregroundStyle(.secondary)
 
-                Text(question.text)
-                    .font(.title3.bold())
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
+                        Text(question.text)
+                            .font(.title3.bold())
+                            .multilineTextAlignment(.center)
 
-                VStack(spacing: 10) {
-                    ForEach(Array(question.options.enumerated()), id: \.offset) { index, option in
-                        Button {
-                            viewModel.selectOption(index)
-                        } label: {
-                            HStack {
-                                Text(OptionLabel.prefixed(index))
-                                    .bold()
-                                Text(option)
-                                Spacer()
+                        VStack(spacing: 10) {
+                            ForEach(Array(question.options.enumerated()), id: \.offset) { index, option in
+                                Button {
+                                    viewModel.selectOption(index)
+                                } label: {
+                                    HStack {
+                                        Text(OptionLabel.prefixed(index))
+                                            .bold()
+                                        Text(option)
+                                        Spacer()
+                                    }
+                                    .padding(.horizontal, 14)
+                                    .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(viewModel.selectedOptionIndex == index ? Color.blue.opacity(0.2) : Color.gray.opacity(0.15))
+                                    )
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(viewModel.selectedOptionIndex == index ? Color.blue : Color.clear, lineWidth: 2)
+                                    )
+                                    .contentShape(Rectangle())
+                                }
+                                .buttonStyle(.plain)
+                                .frame(maxWidth: .infinity)
+                                .disabled(viewModel.hasSubmitted)
                             }
-                            .padding(.horizontal, 14)
-                            .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(viewModel.selectedOptionIndex == index ? Color.blue.opacity(0.2) : Color.gray.opacity(0.15))
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(viewModel.selectedOptionIndex == index ? Color.blue : Color.clear, lineWidth: 2)
-                            )
-                            .contentShape(Rectangle())
                         }
-                        .buttonStyle(.plain)
-                        .frame(maxWidth: .infinity)
-                        .disabled(viewModel.hasSubmitted)
-                    }
-                }
 
-                Button {
-                    viewModel.submitAnswer()
-                } label: {
-                    Text(viewModel.hasSubmitted ? "Cevap Gönderildi" : "Cevabı Gönder")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(viewModel.hasSubmitted || viewModel.isSubmitting)
+                        Button {
+                            viewModel.submitAnswer()
+                        } label: {
+                            Text(viewModel.hasSubmitted ? "Cevap Gönderildi" : "Cevabı Gönder")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(viewModel.hasSubmitted || viewModel.isSubmitting)
 
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Oyuncu Durumu")
-                        .font(.footnote.bold())
-                        .foregroundStyle(.secondary)
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Oyuncu Durumu")
+                                .font(.footnote.bold())
+                                .foregroundStyle(.secondary)
 
-                    ForEach(session.players) { player in
-                        HStack {
-                            Text(player.name)
+                            ForEach(session.players) { player in
+                                HStack {
+                                    Text(player.name)
+                                        .font(.footnote)
+                                    Spacer()
+                                    let hasAnswered = room.currentAnswers[player.id] != nil
+                                    Text(hasAnswered ? "CEVAPLADI" : "CEVAPLAMADI")
+                                        .font(.caption.bold())
+                                        .foregroundStyle(hasAnswered ? .green : .red)
+                                }
+                            }
+                        }
+
+                        if viewModel.hasSubmitted {
+                            Text("Cevabın kaydedildi. Diğer oyuncular bekleniyor.")
                                 .font(.footnote)
-                            Spacer()
-                            let hasAnswered = room.currentAnswers[player.id] != nil
-                            Text(hasAnswered ? "CEVAPLADI" : "CEVAPLAMADI")
-                                .font(.caption.bold())
-                                .foregroundStyle(hasAnswered ? .green : .red)
+                                .foregroundStyle(.green)
                         }
                     }
+                    .frame(maxWidth: .infinity, alignment: .top)
                 }
 
-                if viewModel.hasSubmitted {
-                    Text("Cevabın kaydedildi. Diğer oyuncular bekleniyor.")
-                        .font(.footnote)
-                        .foregroundStyle(.green)
-                }
+                ChatPanelView(session: session, title: "Sohbet", height: 170)
             } else {
+                Spacer()
                 ProgressView("Soru yükleniyor...")
+                Spacer()
             }
 
             if let errorMessage = viewModel.errorMessage {
@@ -102,7 +110,8 @@ struct QuestionView: View {
                     .multilineTextAlignment(.center)
             }
         }
-        .padding()
+        .padding(.horizontal)
+        .padding(.vertical, 10)
         .onAppear {
             viewModel.onAppear()
         }

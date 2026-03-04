@@ -233,6 +233,42 @@ final class NetworkLayer {
         #endif
     }
 
+    func observeChatMessages(
+        roomCode: String,
+        onChange: @escaping (Result<[ChatMessage], Error>) -> Void
+    ) -> NetworkListenerToken {
+        #if canImport(FirebaseFirestore)
+        let listener = db.collection("rooms")
+            .document(roomCode.uppercased())
+            .collection("messages")
+            .order(by: "sentAt", descending: false)
+            .limit(toLast: 250)
+            .addSnapshotListener { snapshot, error in
+                if let error {
+                    onChange(.failure(error))
+                    return
+                }
+
+                guard let snapshot else {
+                    onChange(.success([]))
+                    return
+                }
+
+                let messages = snapshot.documents.compactMap { document in
+                    ChatMessage(id: document.documentID, dictionary: document.data())
+                }
+                onChange(.success(messages))
+            }
+
+        return NetworkListenerToken(cancelClosure: {
+            listener.remove()
+        })
+        #else
+        onChange(.failure(NetworkLayerError.firebaseNotConfigured))
+        return NetworkListenerToken(cancelClosure: {})
+        #endif
+    }
+
     func startGame(roomCode: String, completion: @escaping (Error?) -> Void) {
         #if canImport(FirebaseFirestore)
         let roomRef = db.collection("rooms").document(roomCode.uppercased())
@@ -287,6 +323,36 @@ final class NetworkLayer {
             .collection("players")
             .document(playerId)
             .updateData(["isReady": isReady], completion: completion)
+        #else
+        completion(NetworkLayerError.firebaseNotConfigured)
+        #endif
+    }
+
+    func sendChatMessage(
+        roomCode: String,
+        playerId: String,
+        playerName: String,
+        text: String,
+        completion: @escaping (Error?) -> Void
+    ) {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedText.isEmpty else {
+            completion(nil)
+            return
+        }
+
+        #if canImport(FirebaseFirestore)
+        let messageRef = db.collection("rooms")
+            .document(roomCode.uppercased())
+            .collection("messages")
+            .document()
+
+        messageRef.setData([
+            "playerId": playerId,
+            "playerName": playerName,
+            "text": trimmedText,
+            "sentAt": FieldValue.serverTimestamp()
+        ], completion: completion)
         #else
         completion(NetworkLayerError.firebaseNotConfigured)
         #endif

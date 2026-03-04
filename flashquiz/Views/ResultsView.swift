@@ -61,6 +61,9 @@ struct ResultsView: View {
                 }
             }
             .listStyle(.plain)
+            .frame(height: 220)
+
+            ChatPanelView(session: session, title: "Sohbet", height: 150)
 
             if viewModel.isHost {
                 Button {
