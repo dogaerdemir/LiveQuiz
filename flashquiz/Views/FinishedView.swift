@@ -23,24 +23,26 @@ struct FinishedView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
-            List(viewModel.statsRows) { row in
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(row.playerName)
-                        .font(.body.bold())
-                    Text("Skor: \(row.score)")
-                        .font(.subheadline.bold())
-                        .foregroundStyle(.blue)
-                    HStack(spacing: 12) {
-                        Text("Doğru: \(row.correctCount)")
-                            .foregroundStyle(.green)
-                        Text("Yanlış: \(row.wrongCount)")
-                            .foregroundStyle(.red)
-                        Text("Süre Bitti: \(row.timeoutCount)")
-                            .foregroundStyle(.orange)
+            List {
+                ForEach(Array(viewModel.statsRows.enumerated()), id: \.element.id) { index, row in
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("\(index + 1)) \(row.playerName)")
+                            .font(.body.bold())
+                        Text("Skor: \(row.score)")
+                            .font(.subheadline.bold())
+                            .foregroundStyle(.blue)
+                        HStack(spacing: 12) {
+                            Text("Doğru: \(row.correctCount)")
+                                .foregroundStyle(.green)
+                            Text("Yanlış: \(row.wrongCount)")
+                                .foregroundStyle(.red)
+                            Text("Süre Bitti: \(row.timeoutCount)")
+                                .foregroundStyle(.orange)
+                        }
+                        .font(.footnote)
                     }
-                    .font(.footnote)
+                    .padding(.vertical, 2)
                 }
-                .padding(.vertical, 2)
             }
             .listStyle(.plain)
 

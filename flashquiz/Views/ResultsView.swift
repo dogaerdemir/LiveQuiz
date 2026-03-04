@@ -30,25 +30,32 @@ struct ResultsView: View {
                     .multilineTextAlignment(.center)
             }
 
-            List(session.players) { player in
+            List(viewModel.rankedPlayers) { ranked in
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(player.name)
+                        Text("\(ranked.rank)) \(ranked.player.name)")
                             .font(.body.bold())
-                        Text(viewModel.labelForSelection(of: player))
+                        Text(viewModel.labelForSelection(of: ranked.player))
                             .font(.footnote)
                             .foregroundStyle(.secondary)
-                        Text("Skor: \(viewModel.scoreForPlayer(player))")
+                        Text("Skor: \(ranked.score)")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    if viewModel.isCorrectSelection(of: player) {
+                    if viewModel.isCorrectSelection(of: ranked.player) {
                         Text("Doğru")
                             .font(.caption.bold())
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
                             .background(Color.green.opacity(0.2))
+                            .clipShape(Capsule())
+                    } else if viewModel.isWrongSelection(of: ranked.player) {
+                        Text("Yanlış")
+                            .font(.caption.bold())
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(Color.red.opacity(0.2))
                             .clipShape(Capsule())
                     }
                 }
