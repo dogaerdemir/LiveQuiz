@@ -10,7 +10,7 @@ import Combine
 final class QuestionViewModel: ObservableObject {
     @Published var selectedOptionIndex: Int?
     @Published var hasSubmitted: Bool = false
-    @Published var remainingSeconds: Int = 30
+    @Published var remainingSeconds: Int = 20
     @Published var isSubmitting: Bool = false
     @Published var errorMessage: String?
 

@@ -62,6 +62,7 @@ enum NetworkLayerError: LocalizedError {
 final class NetworkLayer {
     static let shared = NetworkLayer()
     private static let defaultMaxPlayers = 10
+    private static let defaultQuestionDuration = 20
 
     #if canImport(FirebaseFirestore)
     private let db = Firestore.firestore()
@@ -433,6 +434,7 @@ final class NetworkLayer {
                 let batch = self.db.batch()
                 batch.updateData([
                     "phase": RoomPhase.waiting.rawValue,
+                    "questionDuration": Self.defaultQuestionDuration,
                     "currentQuestionIndex": 0,
                     "currentAnswers": [:],
                     "answerLog": [:],
@@ -545,7 +547,7 @@ private extension NetworkLayer {
                 "code": roomCode,
                 "hostId": hostPlayer.id,
                 "phase": RoomPhase.waiting.rawValue,
-                "questionDuration": 30,
+                "questionDuration": Self.defaultQuestionDuration,
                 "questionCount": questionCount,
                 "selectedCategory": selectedCategory.rawValue,
                 "maxPlayers": Self.defaultMaxPlayers,
