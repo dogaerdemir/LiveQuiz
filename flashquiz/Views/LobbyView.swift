@@ -21,7 +21,7 @@ struct LobbyView: View {
 
             Text("Kategori: \(viewModel.selectedCategoryTitle)")
                 .font(.footnote)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.appTextSecondary)
 
             Text("Oyuncular (\(viewModel.players.count)/\(viewModel.maxPlayers))")
                 .font(.headline)
@@ -30,9 +30,10 @@ struct LobbyView: View {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(player.name)
+                            .foregroundStyle(.appTextPrimary)
                         Text(player.isReady ? "Hazır" : "Hazır değil")
                             .font(.caption)
-                            .foregroundStyle(player.isReady ? .green : .orange)
+                            .foregroundStyle(player.isReady ? .appSuccess : .appWarning)
                     }
                     Spacer()
                     if player.isHost {
@@ -40,15 +41,17 @@ struct LobbyView: View {
                             .font(.caption)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
-                            .background(Color.blue.opacity(0.15))
+                            .background(Color.appAccent.opacity(0.2))
                             .clipShape(Capsule())
                     }
                 }
+                .listRowBackground(Color.appSurface)
             }
             .listStyle(.plain)
+            .scrollContentBackground(.hidden)
             .frame(height: 220)
 
-            ChatPanelView(session: session, title: "Sohbet", height: 160)
+            ChatPanelView(session: session, title: "Sohbet", height: 140)
 
             Button(viewModel.isCurrentPlayerReady ? "Hazır Değilim" : "Hazırım") {
                 viewModel.toggleReady()
@@ -57,7 +60,7 @@ struct LobbyView: View {
 
             Text("Hazır Oyuncular: \(viewModel.readyPlayersCount)/\(viewModel.players.count)")
                 .font(.footnote)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.appTextSecondary)
 
             if viewModel.isHost {
                 Button {
@@ -72,16 +75,16 @@ struct LobbyView: View {
                 if !viewModel.hasMinimumPlayers {
                     Text("Başlamak için en az 2 oyuncu gerekli.")
                         .font(.footnote)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.appTextSecondary)
                 } else if !viewModel.allPlayersReady {
                     Text("Oyunu başlatmak için tüm oyuncular hazır olmalı.")
                         .font(.footnote)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.appTextSecondary)
                 }
             } else {
                 Text("Oda sahibi oyunu başlatınca sorular otomatik başlayacak.")
                     .font(.footnote)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.appTextSecondary)
                     .multilineTextAlignment(.center)
             }
 
@@ -92,11 +95,13 @@ struct LobbyView: View {
 
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(.appDanger)
                     .font(.footnote)
                     .multilineTextAlignment(.center)
             }
         }
         .padding()
+        .background(Color.appBackground.ignoresSafeArea())
+        .dismissKeyboardOnTap()
     }
 }

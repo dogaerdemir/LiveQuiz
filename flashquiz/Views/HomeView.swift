@@ -14,9 +14,10 @@ struct HomeView: View {
                 VStack(spacing: 8) {
                     Text("FlashQuiz")
                         .font(.largeTitle.bold())
+                        .foregroundStyle(.appTextPrimary)
                     Text("Gerçek zamanlı bilgi yarışması")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.appTextSecondary)
                         .multilineTextAlignment(.center)
                 }
 
@@ -36,7 +37,7 @@ struct HomeView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Soru sayısı")
                                 .font(.footnote)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.appTextSecondary)
 
                             Picker("Soru sayısı", selection: $viewModel.selectedQuestionCount) {
                                 ForEach(viewModel.questionCountOptions, id: \.self) { count in
@@ -49,7 +50,7 @@ struct HomeView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Kategori")
                                 .font(.footnote)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.appTextSecondary)
 
                             Picker("Kategori", selection: $viewModel.selectedCategory) {
                                 ForEach(viewModel.categoryOptions) { category in
@@ -68,9 +69,7 @@ struct HomeView: View {
                         .buttonStyle(.borderedProminent)
                         .disabled(viewModel.isLoading)
                     }
-                    .padding()
-                    .background(Color.gray.opacity(0.08))
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .appCardStyle()
                 } else {
                     VStack(alignment: .leading, spacing: 16) {
                         TextField("Oda kodu", text: $viewModel.roomCodeInput)
@@ -90,9 +89,7 @@ struct HomeView: View {
                         .buttonStyle(.borderedProminent)
                         .disabled(viewModel.isLoading)
                     }
-                    .padding()
-                    .background(Color.gray.opacity(0.08))
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .appCardStyle()
                 }
 
                 if viewModel.isLoading {
@@ -101,7 +98,7 @@ struct HomeView: View {
 
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(.appDanger)
                         .font(.footnote)
                         .multilineTextAlignment(.center)
                 }
@@ -109,6 +106,7 @@ struct HomeView: View {
                 Spacer()
             }
             .padding()
+            .background(Color.appBackground.ignoresSafeArea())
         }
     }
 }

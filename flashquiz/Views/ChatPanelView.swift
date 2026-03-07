@@ -8,15 +8,17 @@ import SwiftUI
 struct ChatPanelView: View {
     @ObservedObject var session: AppSession
     var title: String = "Sohbet"
-    var height: CGFloat = 180
+    var height: CGFloat = 160
 
     @State private var messageText: String = ""
     @State private var sendingErrorMessage: String?
+    @FocusState private var isMessageFieldFocused: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
                 .font(.headline)
+                .foregroundStyle(.appTextPrimary)
 
             ScrollViewReader { proxy in
                 ScrollView {
@@ -24,7 +26,7 @@ struct ChatPanelView: View {
                         if session.chatMessages.isEmpty {
                             Text("Henüz mesaj yok.")
                                 .font(.footnote)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.appTextSecondary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.top, 4)
                         }
@@ -38,11 +40,11 @@ struct ChatPanelView: View {
                     .padding(.vertical, 4)
                 }
                 .frame(height: height)
-                .background(Color.white.opacity(0.8))
+                .background(Color.appSurface)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.gray.opacity(0.25), lineWidth: 1)
+                        .stroke(Color.appBorder, lineWidth: 1)
                 )
                 .onAppear {
                     scrollToBottom(with: proxy, animated: false)
@@ -50,12 +52,16 @@ struct ChatPanelView: View {
                 .onChange(of: session.chatMessages.count) { _, _ in
                     scrollToBottom(with: proxy, animated: true)
                 }
+                .onTapGesture {
+                    isMessageFieldFocused = false
+                }
             }
 
             HStack(spacing: 8) {
                 TextField("Mesaj yaz...", text: $messageText, axis: .vertical)
                     .textFieldStyle(.roundedBorder)
                     .lineLimit(1...3)
+                    .focused($isMessageFieldFocused)
 
                 Button("Gönder") {
                     sendMessage()
@@ -67,7 +73,15 @@ struct ChatPanelView: View {
             if let sendingErrorMessage {
                 Text(sendingErrorMessage)
                     .font(.caption)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(.appDanger)
+            }
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("Bitti") {
+                    isMessageFieldFocused = false
+                }
             }
         }
     }
@@ -87,6 +101,7 @@ struct ChatPanelView: View {
                 return
             }
             messageText = ""
+            isMessageFieldFocused = false
         }
     }
 
@@ -105,15 +120,15 @@ struct ChatPanelView: View {
     private func messageRow(_ message: ChatMessage) -> some View {
         let isCurrentUser = message.playerId == session.currentPlayer?.id
         let rowAlignment: Alignment = isCurrentUser ? .trailing : .leading
-        let bubbleColor = isCurrentUser ? Color.blue.opacity(0.12) : Color.gray.opacity(0.12)
+        let bubbleColor = isCurrentUser ? Color.appAccent.opacity(0.22) : Color.appSurfaceAlt
 
         VStack(alignment: .leading, spacing: 3) {
             Text("\(message.playerName) • \(Self.timeFormatter.string(from: message.sentAt))")
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.appTextSecondary)
             Text(message.text)
                 .font(.footnote)
-                .foregroundStyle(.primary)
+                .foregroundStyle(.appTextPrimary)
         }
         .padding(8)
         .frame(maxWidth: .infinity, alignment: rowAlignment)
@@ -126,7 +141,7 @@ struct ChatPanelView: View {
     private static let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "HH:mm:ss"
+        formatter.dateFormat = "HH:mm"
         return formatter
     }()
 }

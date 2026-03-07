@@ -19,6 +19,9 @@ struct ContentView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
+            Color.appBackground
+                .ignoresSafeArea()
+
             if session.roomCode == nil {
                 HomeView(viewModel: homeViewModel)
             } else {
@@ -31,11 +34,13 @@ struct ContentView: View {
                     .foregroundStyle(.white)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
-                    .background(Color.red.opacity(0.85))
+                    .background(Color.appDanger.opacity(0.9))
                     .clipShape(Capsule())
                     .padding(.bottom, 12)
             }
         }
+        .tint(.appAccent)
+        .dismissKeyboardOnTap()
     }
 }
 
@@ -64,7 +69,7 @@ private struct RoomFlowView: View {
                     ProgressView()
                     Text("Oda bilgisi yükleniyor...")
                         .font(.footnote)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.appTextSecondary)
                 }
             }
         }

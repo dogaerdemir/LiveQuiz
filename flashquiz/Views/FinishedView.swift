@@ -18,10 +18,11 @@ struct FinishedView: View {
         VStack(spacing: 14) {
             Text("Oyun Sonu")
                 .font(.largeTitle.bold())
+                .foregroundStyle(.appTextPrimary)
 
             Text("Toplam Soru: \(viewModel.totalQuestionCount)")
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.appTextSecondary)
 
             List {
                 ForEach(Array(viewModel.statsRows.enumerated()), id: \.element.id) { index, row in
@@ -30,21 +31,23 @@ struct FinishedView: View {
                             .font(.body.bold())
                         Text("Skor: \(row.score)")
                             .font(.subheadline.bold())
-                            .foregroundStyle(.blue)
+                            .foregroundStyle(.appAccent)
                         HStack(spacing: 12) {
                             Text("Doğru: \(row.correctCount)")
-                                .foregroundStyle(.green)
+                                .foregroundStyle(.appSuccess)
                             Text("Yanlış: \(row.wrongCount)")
-                                .foregroundStyle(.red)
+                                .foregroundStyle(.appDanger)
                             Text("Süre Bitti: \(row.timeoutCount)")
-                                .foregroundStyle(.orange)
+                                .foregroundStyle(.appWarning)
                         }
                         .font(.footnote)
                     }
                     .padding(.vertical, 2)
+                    .listRowBackground(Color.appSurface)
                 }
             }
             .listStyle(.plain)
+            .scrollContentBackground(.hidden)
             .frame(height: 230)
 
             ChatPanelView(session: session, title: "Sohbet", height: 150)
@@ -58,7 +61,7 @@ struct FinishedView: View {
             } else {
                 Text("Oda sahibi tekrar oyna dediğinde lobiye dönüp tekrar hazır olabilirsiniz.")
                     .font(.footnote)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.appTextSecondary)
                     .multilineTextAlignment(.center)
             }
 
@@ -70,10 +73,12 @@ struct FinishedView: View {
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
                     .font(.footnote)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(.appDanger)
                     .multilineTextAlignment(.center)
             }
         }
         .padding()
+        .background(Color.appBackground.ignoresSafeArea())
+        .dismissKeyboardOnTap()
     }
 }

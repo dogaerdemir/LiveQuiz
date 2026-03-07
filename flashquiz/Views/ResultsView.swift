@@ -19,14 +19,16 @@ struct ResultsView: View {
             if let question = session.room?.currentQuestion {
                 Text("Sonuçlar")
                     .font(.largeTitle.bold())
+                    .foregroundStyle(.appTextPrimary)
 
                 Text(question.text)
                     .font(.headline)
                     .multilineTextAlignment(.center)
+                    .foregroundStyle(.appTextPrimary)
 
                 Text("Doğru Cevap: \(OptionLabel.prefixed(question.correctOptionIndex)) \(question.options[question.correctOptionIndex])")
                     .font(.subheadline.bold())
-                    .foregroundStyle(.green)
+                    .foregroundStyle(.appSuccess)
                     .multilineTextAlignment(.center)
             }
 
@@ -37,10 +39,10 @@ struct ResultsView: View {
                             .font(.body.bold())
                         Text(viewModel.labelForSelection(of: ranked.player))
                             .font(.footnote)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.appTextSecondary)
                         Text("Skor: \(ranked.score)")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.appTextSecondary)
                     }
                     Spacer()
                     if viewModel.isCorrectSelection(of: ranked.player) {
@@ -48,19 +50,21 @@ struct ResultsView: View {
                             .font(.caption.bold())
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
-                            .background(Color.green.opacity(0.2))
+                            .background(Color.appSuccess.opacity(0.2))
                             .clipShape(Capsule())
                     } else if viewModel.isWrongSelection(of: ranked.player) {
                         Text("Yanlış")
                             .font(.caption.bold())
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
-                            .background(Color.red.opacity(0.2))
+                            .background(Color.appDanger.opacity(0.2))
                             .clipShape(Capsule())
                     }
                 }
+                .listRowBackground(Color.appSurface)
             }
             .listStyle(.plain)
+            .scrollContentBackground(.hidden)
             .frame(height: 220)
 
             ChatPanelView(session: session, title: "Sohbet", height: 150)
@@ -77,17 +81,19 @@ struct ResultsView: View {
             } else {
                 Text("Oda sahibi sonraki soruya geçtiğinde oyun devam edecek.")
                     .font(.footnote)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.appTextSecondary)
                     .multilineTextAlignment(.center)
             }
 
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
                     .font(.footnote)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(.appDanger)
                     .multilineTextAlignment(.center)
             }
         }
         .padding()
+        .background(Color.appBackground.ignoresSafeArea())
+        .dismissKeyboardOnTap()
     }
 }

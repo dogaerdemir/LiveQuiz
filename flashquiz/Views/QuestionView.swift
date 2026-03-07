@@ -21,15 +21,16 @@ struct QuestionView: View {
                     VStack(spacing: 14) {
                         Text("Süre: \(viewModel.remainingSeconds)")
                             .font(.title.bold())
-                            .foregroundStyle(viewModel.remainingSeconds <= 5 ? .red : .primary)
+                            .foregroundStyle(viewModel.remainingSeconds <= 5 ? .appDanger : .appTextPrimary)
 
                         Text("Soru \(room.currentQuestionIndex + 1) / \(room.questions.count)")
                             .font(.headline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.appTextSecondary)
 
                         Text(question.text)
                             .font(.title3.bold())
                             .multilineTextAlignment(.center)
+                            .foregroundStyle(.appTextPrimary)
 
                         VStack(spacing: 10) {
                             ForEach(Array(question.options.enumerated()), id: \.offset) { index, option in
@@ -46,11 +47,11 @@ struct QuestionView: View {
                                     .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
                                     .background(
                                         RoundedRectangle(cornerRadius: 12)
-                                            .fill(viewModel.selectedOptionIndex == index ? Color.blue.opacity(0.2) : Color.gray.opacity(0.15))
+                                            .fill(viewModel.selectedOptionIndex == index ? Color.appAccent.opacity(0.24) : Color.appSurfaceAlt)
                                     )
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 12)
-                                            .stroke(viewModel.selectedOptionIndex == index ? Color.blue : Color.clear, lineWidth: 2)
+                                            .stroke(viewModel.selectedOptionIndex == index ? Color.appAccent : Color.appBorder, lineWidth: viewModel.selectedOptionIndex == index ? 2 : 1)
                                     )
                                     .contentShape(Rectangle())
                                 }
@@ -72,17 +73,18 @@ struct QuestionView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Oyuncu Durumu")
                                 .font(.footnote.bold())
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.appTextSecondary)
 
                             ForEach(session.players) { player in
                                 HStack {
                                     Text(player.name)
                                         .font(.footnote)
+                                        .foregroundStyle(.appTextPrimary)
                                     Spacer()
                                     let hasAnswered = room.currentAnswers[player.id] != nil
                                     Text(hasAnswered ? "CEVAPLADI" : "CEVAPLAMADI")
                                         .font(.caption.bold())
-                                        .foregroundStyle(hasAnswered ? .green : .red)
+                                        .foregroundStyle(hasAnswered ? .appSuccess : .appDanger)
                                 }
                             }
                         }
@@ -90,13 +92,13 @@ struct QuestionView: View {
                         if viewModel.hasSubmitted {
                             Text("Cevabın kaydedildi. Diğer oyuncular bekleniyor.")
                                 .font(.footnote)
-                                .foregroundStyle(.green)
+                                .foregroundStyle(.appSuccess)
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .top)
                 }
 
-                ChatPanelView(session: session, title: "Sohbet", height: 170)
+                ChatPanelView(session: session, title: "Sohbet", height: 150)
             } else {
                 Spacer()
                 ProgressView("Soru yükleniyor...")
@@ -106,12 +108,14 @@ struct QuestionView: View {
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
                     .font(.footnote)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(.appDanger)
                     .multilineTextAlignment(.center)
             }
         }
         .padding(.horizontal)
         .padding(.vertical, 10)
+        .background(Color.appBackground.ignoresSafeArea())
+        .dismissKeyboardOnTap()
         .onAppear {
             viewModel.onAppear()
         }
